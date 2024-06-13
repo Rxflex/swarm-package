@@ -28,9 +28,8 @@ jobs:
           for dir in $DOCKERFILES; do
             # Получаем название репозитория в нижнем регистре
             repo_name=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
-            # Используем название репозитория как часть имени Docker образа
-            tag=$(basename $dir)
-            image_name="ghcr.io/$repo_name/$repo_name:$tag"
+            # Используем название репозитория и тег python3.8
+            image_name="ghcr.io/$repo_name:python3.8"
             echo "Building image $image_name in directory $dir"
             echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u $GITHUB_ACTOR --password-stdin
             docker build -t $image_name $dir

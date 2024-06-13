@@ -23,16 +23,21 @@ jobs:
       - name: Find and build Docker images
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_USERNAME: ${{ github.actor }}
         run: |
+          # Преобразуем имя пользователя GitHub в нижний регистр
+          GITHUB_USERNAME_LOWER=$(echo "${GITHUB_USERNAME}" | tr '[:upper:]' '[:lower:]')
           # Используем команду find для поиска всех подкаталогов с Dockerfile
           DOCKERFILES=$(find . -name Dockerfile -exec dirname {} \;)
           for dir in $DOCKERFILES; do
             # Получаем имя папки из пути и форматируем его для использования в теге Docker
-            folder_name=$(basename $dir | tr '[:upper:]' '[:lower:]' | tr -cd '[[:alnum:]]_-')
+            folder_name=$(basename $dir)
+            folder_name_lc=$(echo "${folder_name}" | tr '[:upper:]' '[:lower:]' | tr -cd '[[:alnum:]]_-')
             # Строим имя образа, используя имя папки и динамически определенное имя репозитория
-            image_name="ghcr.io/${{ github.repository | replace('/', '_') | lower }}:${folder_name}"
+            image_name="ghcr.io/${GITHUB_USERNAME_LOWER}/${GITHUB_REPOSITORY}:${folder_name_lc}"
             echo "Building image $image_name in directory $dir"
             echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u $GITHUB_ACTOR --password-stdin
             docker build -t $image_name $dir
             docker push $image_name
           done
+

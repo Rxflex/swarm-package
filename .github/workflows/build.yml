@@ -27,13 +27,12 @@ jobs:
           DOCKERFILES=$(find . -name Dockerfile -exec dirname {} \;)
           for dir in $DOCKERFILES; do
             # Получаем название репозитория в нижнем регистре
-            repo_owner=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
-            # Формируем имя Docker образа с тегом latest
-            tag="latest"
-            image_name="ghcr.io/$repo_owner/$(basename $dir | tr '[:upper:]' '[:lower:]'):$tag"
+            repo_name=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
+            # Используем название репозитория как часть имени Docker образа
+            tag=$(basename $dir)
+            image_name="ghcr.io/$repo_name/$repo_name:$tag"
             echo "Building image $image_name in directory $dir"
             echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u $GITHUB_ACTOR --password-stdin
             docker build -t $image_name $dir
             docker push $image_name
           done
-

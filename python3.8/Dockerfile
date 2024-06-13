@@ -1,5 +1,7 @@
 FROM ghcr.io/parkervcp/yolks:python_3.8
 
+USER root
+
 RUN apt update && apt install -y git curl jq file unzip make gcc g++ libtool
 
 RUN mkdir -p /mnt/server

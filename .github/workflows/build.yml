@@ -30,7 +30,7 @@ jobs:
             # Получаем имя папки из пути и форматируем его для использования в теге Docker
             folder_name=$(basename $dir | tr '[:upper:]' '[:lower:]' | tr -cd '[[:alnum:]]_-')
             # Строим имя образа, используя имя папки и динамически определенное имя репозитория
-            image_name="ghcr.io/${{ github.repository }}:${folder_name}"
+            image_name="ghcr.io/${{ github.repository | replace('/', '_') | lower }}:${folder_name}"
             echo "Building image $image_name in directory $dir"
             echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u $GITHUB_ACTOR --password-stdin
             docker build -t $image_name $dir

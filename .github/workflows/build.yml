@@ -3,7 +3,7 @@ name: Docker Build and Publish
 on:
   push:
     branches:
-      - main  # настройте ветки, на которых должен запускаться workflow
+      - main
 
 jobs:
   build-and-push:
@@ -20,11 +20,17 @@ jobs:
         if: matrix.platform == 'arm64'
         run: docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
 
-      - name: Build and push Docker images
+      - name: Find and build Docker images
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u $GITHUB_ACTOR --password-stdin
-          docker build -t ghcr.io/myusername/myimage:${{ github.sha }}-${{ matrix.platform }} .
-          docker push ghcr.io/myusername/myimage:${{ github.sha }}-${{ matrix.platform }}
+          DOCKERFILES=$(find . -name Dockerfile -exec dirname {} \;)
+          
+          for dir in $DOCKERFILES; do
+            image_name="ghcr.io/${{ github.repository_owner }}/$(basename $dir):${{ github.sha }}-${{ matrix.platform }}"
+            echo "Building image $image_name in directory $dir"
+            echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u $GITHUB_ACTOR --password-stdin
+            docker build -t $image_name $dir
+            docker push $image_name
+          done
 

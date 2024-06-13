@@ -4,7 +4,7 @@ version: '3.8'
 
 services:
   python_app:
-    image: ghcr.io/rxflex/swarm-package:python3.8
+    image: ghcr.io/rxflex/swarm-package:python38
     deploy:
       replicas: 1
       restart_policy:

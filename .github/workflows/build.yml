@@ -1,0 +1,30 @@
+name: Docker Build and Publish
+
+on:
+  push:
+    branches:
+      - main  # настройте ветки, на которых должен запускаться workflow
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        platform: [amd64, arm64]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up QEMU
+        if: matrix.platform == 'arm64'
+        run: docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+
+      - name: Build and push Docker images
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u $GITHUB_ACTOR --password-stdin
+          docker build -t ghcr.io/myusername/myimage:${{ github.sha }}-${{ matrix.platform }} .
+          docker push ghcr.io/myusername/myimage:${{ github.sha }}-${{ matrix.platform }}
+

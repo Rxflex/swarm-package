@@ -23,7 +23,7 @@ jobs:
       - name: Find and build Docker images
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          REPO_NAME: ${{ github.repository | replace('/', '_') | lower }}
+          REPO_NAME: ${{ github.repository_owner }}_${{ github.repository_name }}
         run: |
           # Используем команду find для поиска всех подкаталогов с Dockerfile
           DOCKERFILES=$(find . -name Dockerfile -exec dirname {} \;)

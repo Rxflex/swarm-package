@@ -30,7 +30,7 @@ jobs:
             repo_owner=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
             # Формируем имя Docker образа с тегом latest
             tag="latest"
-            image_name="ghcr.io/$repo_owner/$(basename $dir | tr '[:upper:]' '[:lower:]'):$tag-${{ matrix.platform }}"
+            image_name="ghcr.io/$repo_owner/$(basename $dir | tr '[:upper:]' '[:lower:]'):$tag"
             echo "Building image $image_name in directory $dir"
             echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u $GITHUB_ACTOR --password-stdin
             docker build -t $image_name $dir
